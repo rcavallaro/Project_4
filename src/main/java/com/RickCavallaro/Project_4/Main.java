@@ -4,14 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import com.sun.deploy.net.HttpResponse;
+//import com.sun.deploy.net.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.ClosableHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -25,8 +26,8 @@ import java.util.List;
 
 class HttpException extends IOException {
     public HttpException(HttpResponse response) {
-        super(response.getStatusLine()getStatusCode() + ": "
-        +response.GetStatusLine().getReasonPhrase());
+        super(response.getStatusLine().getStatusCode() + ": "
+        +response.getStatusLine().getReasonPhrase());
     }
 }
 
@@ -104,6 +105,7 @@ class Todo {
 
     public String getTitle() {
         return title;
+    }
 
     public void setTitle(String title) {
         this.title = title;
@@ -137,6 +139,15 @@ class Todo {
     public String toString() {
         return "TODO ID: " + id + ", Title: " + title + ", Body: " + body
                 + ", Priority: " + priority;
+    }
+}
+
+class TodoCollection implements Iterable<Todo> {
+    private List<Todo> todos;
+
+    @Override
+    public Iterator<Todo> iterator() {
+        return todos.iterator();
     }
 }
 
@@ -239,11 +250,12 @@ public class Main {
     public static void main(String[] args) {
         TodoAPIWrapper todoAPI = new TodoAPIWrapper(
                 "http://todo.eastus.cloudapp.azure.com/todo-android",
-                "arthur", "arthur");
+                "richard", "richard");
         // create two todos
         System.out.println("Adding todos");
         todoAPI.createTodo("Study", "Study for exam", 2);
         todoAPI.createTodo("Dinner", "Prepare dinner", 3);
+        todoAPI.createTodo("Dishes", "Wash dishes", 1);
 
         // get todos and list them
         System.out.println("Getting todos");
@@ -275,5 +287,14 @@ public class Main {
         for (Todo todo: todos) {
             System.out.println(todo);
         }
+
+        System.out.println("Show priority 3 todos");
+        //todos = todoAPI.getTodos();
+        for (Todo todo: todos) {
+            if (todo.getPriority() == 3){
+                System.out.println(todo);
+            }
+        }
+
     }
 }
